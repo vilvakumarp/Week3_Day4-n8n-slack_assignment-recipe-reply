@@ -1,0 +1,189 @@
+{
+  "name": "n8n - slack assignment",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "message"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C0C9YPT36F7",
+          "mode": "list",
+          "cachedResultName": "new-channel"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7d2ba5f1-df20-4a87-b7bc-c55ce36a5454",
+      "name": "slack_trigger__msg",
+      "webhookId": "14ae178b-b43b-4962-9efc-ec7f106530cd",
+      "credentials": {
+        "slackApi": {
+          "id": "zdOHNp2XqdAEGpEJ",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72eb0aa9-ba2a-46bf-b4d7-9769f64512cb",
+              "name": "recipe",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "7de7ee6a-7745-4ed6-8553-5987b165cc51",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a helpful recipe assistant.\n\nThe recipe requested by the user is: {{ $json.recipe }}\n\nList the ingredients and products needed to make this recipe, including approximate quantities for 2–3 people.\n\nReturn a clear, practical bulleted list.\nIf the recipe name is empty or unclear, ask the user to provide a clearer recipe name.\nKeep the response concise and easy to read in Slack.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        432,
+        0
+      ],
+      "id": "277e3636-ae22-4ef3-84e0-1a9eb85fcfc3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        192
+      ],
+      "id": "648ef071-4e2b-4c95-96f0-bba5ab6a0e7b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "b59V88jxZsk4FIK1",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C9YPT36F7",
+          "mode": "list",
+          "cachedResultName": "new-channel"
+        },
+        "text": "={{ $json.text }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        800,
+        0
+      ],
+      "id": "65855684-f475-4fc9-bb2a-3aa0c54b0b54",
+      "name": "Send a message",
+      "webhookId": "4808ff42-dc44-48fd-aa56-6e8256ade1da",
+      "credentials": {
+        "slackApi": {
+          "id": "zdOHNp2XqdAEGpEJ",
+          "name": "Slack account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "slack_trigger__msg": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "fdbf3bac-732a-47d0-b1a5-4ab9b4ac4353",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a37dbab793a1fe390dd18ae403ae3d05c186f6630d9785503bd83dbcb176f18"
+  },
+  "nodeGroups": [],
+  "id": "HsXR1TT8zOCQSLxA",
+  "tags": []
+}
